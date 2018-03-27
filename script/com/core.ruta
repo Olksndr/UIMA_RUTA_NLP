@@ -1,0 +1,158 @@
+PACKAGE com;
+
+DECLARE Sentence;
+PERIOD #{-> MARK(Sentence)} PERIOD;
+
+
+// 
+WORDLIST pin_issues_entity_list = 'pin_issues_entity.txt';
+DECLARE Annotation pin_issues_entity (STRING value);
+W{INLIST(pin_issues_entity_list) -> CREATE(pin_issues_entity, "value" = W)};
+ 
+ 
+DECLARE Pin_issues;
+Sentence{CONTAINS(pin_issues_entity)-> MARK (Pin_issues)};
+
+//
+WORDLIST credit_limit_action_list = 'credit_limit_action.txt';
+DECLARE Annotation credit_limit_action (STRING value);
+W{INLIST(credit_limit_action_list) -> CREATE(credit_limit_action, "value" = W)};
+
+WORDLIST credit_limit_entity_list = 'credit_limit_entity.txt';
+DECLARE Annotation credit_limit_entity (STRING value);
+W{INLIST(credit_limit_entity_list) -> CREATE(credit_limit_entity, "value" = W)};
+
+
+DECLARE Credit_Limit_Change_Limit;
+Sentence{AND(CONTAINS(credit_limit_action), CONTAINS(credit_limit_entity)\
+, -CONTAINS(pin_issues_entity) )-> MARK (Credit_Limit_Change_Limit)};
+
+//
+WORDLIST minimal_payment_entity_list = 'minimal_payment_entity.txt';
+DECLARE Annotation minimal_payment_entity (STRING value);
+W{INLIST(minimal_payment_entity_list) -> CREATE(minimal_payment_entity, "value" = W)};
+
+WORDLIST minimal_payment_modifier_list = 'minimal_payment_modifier.txt';
+DECLARE Annotation minimal_payment_modifier (STRING value);
+W{INLIST(minimal_payment_modifier_list) -> CREATE(minimal_payment_modifier, "value" = W)};
+
+DECLARE Payment_Minimum_Payment;
+Sentence{AND(CONTAINS(minimal_payment_entity), CONTAINS(minimal_payment_modifier))\
+ -> MARK(Payment_Minimum_Payment)}; 
+ //
+ 
+ WORDLIST payment_entity_list = 'payment_entity.txt';
+ DECLARE Annotation payment_entity (STRING value);
+ W{INLIST(payment_entity_list) -> CREATE(payment_entity, "value" = W)};
+ 
+ WORDLIST payment_action_list = 'payment_action.txt';
+ DECLARE Annotation payment_action (STRING value);
+ W{INLIST(payment_action_list) -> CREATE(payment_action, "value" = W)};
+ 
+ DECLARE Payment;
+ Sentence{AND(CONTAINS(payment_action), CONTAINS(payment_entity))\
+ 
+         -> MARK(Payment)}; 
+  //
+  
+ //
+  //DECLARE EXPECTED_ANOTATION;
+  //Sentence{OR(AND(CONTAINS(payment_action), CONTAINS(payment_entity)),\
+      //    REGEXP("PIN"))
+        //  -> MARK(Payment)};
+        
+
+ WORDLIST avaliable_credit_entity_list = 'avaliable_credit_entity.txt';
+ DECLARE  Annotation avaliable_credit_entity (STRING value);
+ W{INLIST(avaliable_credit_entity_list) -> CREATE(avaliable_credit_entity, "value" = W)};
+ 
+ WORDLIST avaliable_credit_modifier_list = 'avaliable_credit_modifier.txt';
+ DECLARE Annotation avaliable_credit_modifier (STRING value);
+ W{INLIST(avaliable_credit_modifier_list) -> CREATE(avaliable_credit_modifier, "value" = W)};
+ 
+ DECLARE Avaliable_credit;
+ Sentence{AND(CONTAINS(avaliable_credit_modifier), CONTAINS(avaliable_credit_entity))\
+         
+         -> MARK(Avaliable_credit)};     
+         
+//
+WORDLIST cancel_card_action_list = 'cancel_card_action.txt';
+ DECLARE cancel_card_action (STRING value);
+ W{INLIST(cancel_card_action_list) -> CREATE(cancel_card_action, "value" = W)};
+ 
+DECLARE Cancel_Card;
+Sentence{CONTAINS(cancel_card_action)
+-> MARK (Cancel_Card)};
+
+
+//
+WORDLIST credit_limit_inquiry_entity_list = 'credit_limit_inquiry_entity.txt';
+DECLARE credit_limit_inquiry_entity;
+W{INLIST (credit_limit_inquiry_entity_list) -> CREATE(credit_limit_inquiry_entity)};
+
+
+DECLARE Credit_Limit_Inquiry;
+Sentence{
+AND(CONTAINS(credit_limit_inquiry_entity), -CONTAINS(credit_limit_action))
+-> MARK(Credit_Limit_Inquiry)
+};
+
+//
+
+WORDLIST apply_for_card_entity_list = 'apply_for_card_entity.txt';
+ DECLARE apply_for_card_entity (STRING value);
+ W{INLIST(apply_for_card_entity_list) -> CREATE(apply_for_card_entity, "value" = W)};
+ 
+ WORDLIST apply_for_card_action_list = 'apply_for_card_action.txt';
+  DECLARE apply_for_card_action (STRING value);
+  W{INLIST(apply_for_card_action_list) -> CREATE(apply_for_card_action, "value" = W)};
+  
+WORDLIST apply_for_card_personal_modifier_list = 'apply_for_card_personal_modifier.txt';
+DECLARE apply_for_card_personal_modifier (STRING value);
+W{INLIST(apply_for_card_personal_modifier_list) -> CREATE(apply_for_card_personal_modifier, "value" = W)};
+
+WORDLIST apply_for_card_business_modifier_list = 'apply_for_card_business_modifier.txt';
+  DECLARE apply_for_card_business_modifier (STRING value);
+  W{INLIST(apply_for_card_business_modifier_list) -> CREATE(apply_for_card_business_modifier, "value" = W)};
+
+DECLARE Apply_for_Card;
+Sentence{AND(CONTAINS(apply_for_card_entity), CONTAINS(apply_for_card_action), 
+-CONTAINS(apply_for_card_personal_modifier), 
+-CONTAINS(apply_for_card_business_modifier))->MARK(Apply_for_Card)}; 
+
+DECLARE Apply_for_Card_Personal;
+Sentence{AND(CONTAINS(apply_for_card_entity), CONTAINS(apply_for_card_action), 
+    CONTAINS(apply_for_card_personal_modifier), 
+-CONTAINS(apply_for_card_business_modifier))->MARK(Apply_for_Card_Personal)}; 
+
+DECLARE Apply_for_Card_Business;
+Sentence{AND(CONTAINS(apply_for_card_entity), CONTAINS(apply_for_card_action), 
+    -CONTAINS(apply_for_card_personal_modifier), 
+CONTAINS(apply_for_card_business_modifier))->MARK(Apply_for_Card_Business)}; 
+//
+
+WORDLIST activate_card_action_list = 'activate_card_action.txt';
+  DECLARE activate_card_action (STRING value);
+  W{INLIST(activate_card_action_list) -> CREATE(activate_card_action, "value" = W)};
+  
+DECLARE Activate_Card;
+Sentence{AND(CONTAINS(apply_for_card_entity), CONTAINS(activate_card_action))
+->MARK(Activate_Card)};
+
+
+WORDLIST balance_entity_list = 'balance_entity.txt';
+DECLARE balance_entity (STRING value);
+  W{INLIST(balance_entity_list) -> CREATE(balance_entity, "value" = W)};
+
+WORDLIST balance_transfer_action_list = 'balance_transfer_action.txt';
+DECLARE balance_transfer_action (STRING value);
+  W{INLIST(balance_transfer_action_list) -> CREATE(balance_transfer_action, "value" = W)};
+ 
+DECLARE Balance_Inquiry;
+Sentence{AND(CONTAINS(balance_entity), -CONTAINS(balance_transfer_action))
+->MARK( Balance_Inquiry)};
+ 
+DECLARE Balance_Balance_Transfer;
+Sentence{CONTAINS(balance_entity), CONTAINS(balance_transfer_action)
+-> MARK(Balance_Balance_Transfer)}; 
+  

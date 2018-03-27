@@ -1,0 +1,6 @@
+available
+Available
+remaining
+Remaining
+left
+Left
